@@ -5,7 +5,6 @@ export default function App() {
   const [nudge, setNudge] = useState("Awaiting call log...");
 
   const processCall = async () => {
-    // Replace the URL below with your Render URL after Step 4
     const res = await fetch('https://fedex-hackathon.onrender.com/analyze', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},

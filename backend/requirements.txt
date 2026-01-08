@@ -4,3 +4,5 @@ textblob
 pydantic
 python-dotenv
 pandas
+supabase
+gotrue
