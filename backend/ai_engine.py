@@ -27,3 +27,12 @@ def verify_compliance(call_count):
     if hour < 8 or hour > 20:
         return {"allowed": False, "reason": "Restricted Calling Hours (8AM-8PM)"}
     return {"allowed": True}
+
+def predict_recovery(data):
+    clean_data = [
+        data.get('days_overdue', 30),  # Default to 30 days if missing
+        data.get('balance', 100.0),    # Default to $100
+        data.get('attempts', 0),
+        data.get('credit_score', 600)  # Default to 600
+    ]
+    return 0.75
