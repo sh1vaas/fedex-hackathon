@@ -1,3 +1,5 @@
+import os  # <--- ADD THIS LINE AT THE VERY TOP
+from supabase import create_client, Client
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from backend.ai_engine import analyze_sentiment, get_bttc, verify_compliance
