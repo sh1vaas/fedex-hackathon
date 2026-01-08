@@ -6,7 +6,7 @@ export default function App() {
 
   const processCall = async () => {
     // Replace the URL below with your Render URL after Step 4
-    const res = await fetch('https://your-backend-url.onrender.com/analyze', {
+    const res = await fetch('https://fedex-hackathon.onrender.com/analyze', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({ text, call_count: 1, case_id: "fedex-101" })
