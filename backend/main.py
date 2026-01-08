@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from ai_engine import analyze_sentiment, get_bttc, verify_compliance
+from backend.ai_engine import analyze_sentiment, get_bttc, verify_compliance
 
 url = os.environ.get("SUPABASE_URL")
 key = os.environ.get("SUPABASE_KEY")
