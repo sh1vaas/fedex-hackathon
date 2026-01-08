@@ -2,12 +2,20 @@ from textblob import TextBlob
 import datetime
 
 def analyze_sentiment(text):
-    polarity = TextBlob(text).sentiment.polarity
-    if polarity < -0.2:
-        return {"sentiment": "Angry", "nudge": "Offer a 15% hardship waiver."}
-    elif polarity > 0.2:
-        return {"sentiment": "Cooperative", "nudge": "Secure payment date now."}
-    return {"sentiment": "Neutral", "nudge": "Follow standard SOP."}
+    # If the text is empty or too short, return neutral immediately
+    if not text or len(text.strip()) < 3:
+        return {"sentiment": "Neutral", "nudge": "Follow standard SOP."}
+
+    analysis = TextBlob(text)
+    polarity = analysis.sentiment.polarity
+    
+    # We make it more sensitive (0.1 instead of 0.2)
+    if polarity <= -0.1:
+        return {"sentiment": "Negative/Hardship", "nudge": "Offer a 15% hardship waiver immediately."}
+    elif polarity >= 0.1:
+        return {"sentiment": "Positive/Cooperative", "nudge": "Client is ready. Confirm payment date now."}
+    else:
+        return {"sentiment": "Neutral", "nudge": "Follow standard SOP."}
 
 def get_bttc(case_id):
     windows = ["08:00 AM - 10:00 AM", "06:00 PM - 08:00 PM"]
