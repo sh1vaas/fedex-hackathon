@@ -17,17 +17,18 @@ export default function App() {
   };
 
   // New function to handle the "Wow Factor" dispute upload
-  const handleFileUpload = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setDisputeStatus("Scanning document with OCR...");
-      
-      // Simulate an AI processing delay (2 seconds)
-      setTimeout(() => {
-        setDisputeStatus("✅ Receipt Verified. Case Suspended automatically.");
-      }, 2000);
-    }
-  };
+  // This runs purely in the browser (React)
+const handleFileUpload = (e) => {
+  const file = e.target.files[0];
+  if (file) {
+    setDisputeStatus("Scanning document with OCR..."); // Step 1: Show "Scanning"
+    
+    // Step 2: Wait 2 seconds, then automatically show "Verified"
+    setTimeout(() => {
+      setDisputeStatus("✅ Receipt Verified. Case Suspended automatically.");
+    }, 2000);
+  }
+};
 
   return (
     <div style={{backgroundColor: '#111827', color: 'white', minHeight: '100vh', padding: '40px', fontFamily: 'Inter, sans-serif'}}>
