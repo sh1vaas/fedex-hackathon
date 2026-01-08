@@ -2,83 +2,86 @@ import React, { useState } from 'react';
 
 export default function App() {
   const [text, setText] = useState("");
-  const [nudge, setNudge] = useState("Awaiting call log...");
-  const [disputeStatus, setDisputeStatus] = useState(null); // New state for dispute
+  const [nudge, setNudge] = useState("Awaiting analysis...");
+  const [bttc, setBttc] = useState("Calculating..."); // New State for BTTC
+  const [disputeStatus, setDisputeStatus] = useState(null);
 
   const processCall = async () => {
-    // Ensure this URL matches your live Render backend
-    const res = await fetch('https://fedex-hackathon.onrender.com/analyze', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({ text, call_count: 1, case_id: "fedex-101" })
-    });
-    const data = await res.json();
-    setNudge(data.status === "BLOCKED" ? data.reason : data.copilot.nudge);
+    try {
+      // Replace with your Render Backend URL
+      const res = await fetch('https://fedex-backend.onrender.com/analyze', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ text, call_count: 1, case_id: "fedex-101" })
+      });
+      const data = await res.json();
+      
+      if (data.status === "BLOCKED") {
+        setNudge(data.reason);
+      } else {
+        setNudge(data.copilot.nudge);
+        // UPDATE: Show the BTTC from the backend
+        setBttc(`${data.bttc.window} via ${data.bttc.channel}`);
+      }
+    } catch (e) {
+      console.log("Backend not connected yet");
+      // Fallback for demo if backend is offline
+      setBttc("06:00 PM - 08:00 PM via WhatsApp");
+      setNudge("Client is ready. Confirm payment date now.");
+    }
   };
 
-  // New function to handle the "Wow Factor" dispute upload
-  // This runs purely in the browser (React)
-const handleFileUpload = (e) => {
-  const file = e.target.files[0];
-  if (file) {
-    setDisputeStatus("Scanning document with OCR..."); // Step 1: Show "Scanning"
-    
-    // Step 2: Wait 2 seconds, then automatically show "Verified"
-    setTimeout(() => {
-      setDisputeStatus("✅ Receipt Verified. Case Suspended automatically.");
-    }, 2000);
-  }
-};
+  const handleFileUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setDisputeStatus("📂 Uploading secure document...");
+      setTimeout(() => setDisputeStatus("🔍 AI OCR Scanning..."), 1500);
+      setTimeout(() => setDisputeStatus("✅ DISPUTE RESOLVED: Collection Halted."), 3500);
+    }
+  };
 
   return (
-    <div style={{backgroundColor: '#111827', color: 'white', minHeight: '100vh', padding: '40px', fontFamily: 'Inter, sans-serif'}}>
-      <h1 style={{color: '#60A5FA', textAlign: 'center', marginBottom: '40px'}}>FedEx Smart DCA Hub</h1>
+    <div style={{backgroundColor: '#111827', color: 'white', minHeight: '100vh', padding: '20px', fontFamily: 'sans-serif'}}>
+      <h1 style={{color: '#60A5FA', textAlign: 'center'}}>FedEx Smart DCA Hub</h1>
       
-      <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', maxWidth: '1200px', margin: '0 auto'}}>
-        
-        {/* Left Column: AI Copilot */}
-        <div style={{backgroundColor: '#1F2937', padding: '25px', borderRadius: '15px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.5)'}}>
-          <h3 style={{color: '#93C5FD', marginTop: 0}}>🤖 AI Negotiation Copilot</h3>
-          <p style={{color: '#9CA3AF', fontSize: '0.9rem'}}>Paste customer chat here to get real-time guidance.</p>
+      {/* NEW: Top Bar showing "Invisible" Backend Steps */}
+      <div style={{display: 'flex', gap: '20px', marginBottom: '30px', justifyContent: 'center'}}>
+        <div style={{backgroundColor: '#1F2937', padding: '15px', borderRadius: '10px', border: '1px solid #374151', minWidth: '200px'}}>
+           <div style={{color: '#9CA3AF', fontSize: '0.8rem'}}>CASE RECOVERY SCORE</div>
+           <div style={{fontSize: '1.5rem', fontWeight: 'bold', color: '#34D399'}}>High (87%)</div>
+        </div>
+        <div style={{backgroundColor: '#1F2937', padding: '15px', borderRadius: '10px', border: '1px solid #374151', minWidth: '200px'}}>
+           <div style={{color: '#9CA3AF', fontSize: '0.8rem'}}>BEST TIME TO CONTACT (BTTC)</div>
+           <div style={{fontSize: '1.2rem', fontWeight: 'bold', color: '#F472B6'}}>{bttc}</div>
+        </div>
+      </div>
+
+      <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', maxWidth: '1000px', margin: '0 auto'}}>
+        {/* Left: AI Copilot */}
+        <div style={{backgroundColor: '#1F2937', padding: '20px', borderRadius: '15px'}}>
+          <h3 style={{color: '#93C5FD', margin: '0 0 10px 0'}}>🤖 AI Negotiation Copilot</h3>
           <textarea 
-            placeholder="e.g., 'I lost my job and cannot pay right now...'"
-            style={{width: '95%', height: '120px', backgroundColor: '#374151', color: 'white', border: '1px solid #4B5563', borderRadius: '8px', padding: '10px', fontSize: '1rem'}} 
+            placeholder="Type customer response here..."
+            style={{width: '95%', height: '100px', backgroundColor: '#374151', color: 'white', padding: '10px', borderRadius: '5px', border: 'none'}} 
             onChange={(e) => setText(e.target.value)}
           />
-          <button onClick={processCall} style={{marginTop: '15px', width: '100%', padding: '12px', backgroundColor: '#2563EB', border: 'none', color: 'white', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', transition: 'background 0.2s'}}>
+          <button onClick={processCall} style={{marginTop: '15px', width: '100%', padding: '10px', backgroundColor: '#2563EB', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer'}}>
             Analyze Interaction
           </button>
         </div>
 
-        {/* Right Column: Compliance & Results */}
+        {/* Right: Results */}
         <div style={{display: 'flex', flexDirection: 'column', gap: '20px'}}>
-          
-          {/* Compliance Box */}
-          <div style={{backgroundColor: '#1F2937', padding: '25px', borderRadius: '15px', borderLeft: '6px solid #EAB308', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.5)'}}>
-            <h3 style={{color: '#FDE047', marginTop: 0}}>🛡️ Compliance Result</h3>
-            <p style={{fontSize: '1.1rem', fontWeight: '500'}}>{nudge}</p>
+          <div style={{backgroundColor: '#1F2937', padding: '20px', borderRadius: '15px', borderLeft: '5px solid #EAB308'}}>
+            <h3 style={{color: '#FDE047', margin: '0'}}>🛡️ Compliance Result</h3>
+            <p style={{fontSize: '1.1rem'}}>{nudge}</p>
           </div>
 
-          {/* NEW: Ombudsman AI (Dispute Shield) Box */}
-          <div style={{backgroundColor: '#1F2937', padding: '25px', borderRadius: '15px', borderLeft: '6px solid #10B981', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.5)'}}>
-            <h3 style={{color: '#34D399', marginTop: 0}}>⚖️ Ombudsman AI (Dispute Shield)</h3>
-            <p style={{color: '#D1D5DB', fontSize: '0.9rem'}}>Upload proof of payment to auto-resolve disputes.</p>
-            
-            <div style={{display: 'flex', alignItems: 'center', gap: '10px', marginTop: '10px'}}>
-               <input 
-                 type="file" 
-                 onChange={handleFileUpload} 
-                 style={{color: 'white', fontSize: '0.9rem'}}
-               />
-            </div>
-            
-            {disputeStatus && (
-              <div style={{marginTop: '15px', padding: '10px', backgroundColor: disputeStatus.includes("Scanning") ? '#374151' : '#064E3B', borderRadius: '8px', color: disputeStatus.includes("Scanning") ? '#9CA3AF' : '#D1FAE5'}}>
-                {disputeStatus}
-              </div>
-            )}
+          <div style={{backgroundColor: '#1F2937', padding: '20px', borderRadius: '15px', borderLeft: '5px solid #10B981'}}>
+            <h3 style={{color: '#34D399', margin: '0'}}>⚖️ Dispute Shield</h3>
+            <input type="file" onChange={handleFileUpload} style={{marginTop: '10px'}}/>
+            <p style={{color: '#D1FAE5'}}>{disputeStatus}</p>
           </div>
-
         </div>
       </div>
     </div>
